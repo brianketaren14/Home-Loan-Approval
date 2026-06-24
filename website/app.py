@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import pickle
-
+from pathlib import Path
 
 # Config / Set Page Settings
 st.set_page_config(
@@ -12,9 +12,9 @@ st.set_page_config(
 )
 
 # Paths
-MODEL_PATH = "model/model.pkl"
-SCALER_PATH = "model/scaler.pkl"
-SELECTED_FEATURES_PATH = "model/selected_features.pkl"
+MODEL_PATH = Path("model") / "model.pkl"
+SCALER_PATH = Path("model") / "scaler.pkl"
+SELECTED_FEATURES_PATH = Path("model") / "selected_features.pkl"
 
 # Load models and resources
 @st.cache_resource
