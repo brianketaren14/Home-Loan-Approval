@@ -38,14 +38,15 @@ The notebook performs the following steps:
 
 The notebook compares model performance using specificity and AUC metrics:
 
-- Logistic Regression:
-  - Ordinary: specificity ~0.70, AUC ~0.73
-  - SMOTETomek: specificity ~0.67, AUC ~0.71
-  - Bayesian tuning: specificity ~0.67, AUC ~0.72
-- XGBoost:
-  - Ordinary: specificity ~0.67, AUC ~0.72
-  - SMOTETomek: specificity ~0.70, AUC ~0.74
-  - Bayesian tuning: specificity ~0.67, AUC ~0.72
+- Specificity:
+  - LR — Ordinary 0.67 / SMOTETomek 0.61 / Bayesian 0.73. 
+  - XGB — Ordinary 0.73 / SMOTETomek 0.73 / Bayesian 0.64.
+- AUC: 
+  - LR — Ordinary 0.74 / SMOTETomek 0.77 / Bayesian 0.77. 
+  - XGB — Ordinary 0.82 / SMOTETomek 0.77 / Bayesian 0.77.
+- Summary: 
+  - LR Bayesian and XGB-SMOTETomek, XGB-Bayesian gives highest specificity (0.73). 
+  - XGB(Ordinary) gives highest AUC (0.82). 
 
 ## Conclusion
 
