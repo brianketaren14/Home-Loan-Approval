@@ -2,6 +2,9 @@
 
 This repository contains a loan approval classification project built from the `loan_sanction_train.csv` dataset. The goal is to predict whether a loan application will be approved based on customer details and financial information.
 
+## Prediction Website UI
+Link : [website](https://home-loan-approval-brian-maxwell-ketaren.streamlit.app/)
+
 ## Project Overview
 
 The notebook performs the following steps:
