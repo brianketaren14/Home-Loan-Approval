@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import pickle
+import joblib
 
 # Config / Set Page Settings
 st.set_page_config(
@@ -11,27 +11,17 @@ st.set_page_config(
 )
 
 # Paths
-MODEL_PATH = "model.pkl"
-SCALER_PATH = "scaler.pkl"
-SELECTED_FEATURES_PATH = "selected_features.pkl"
+MODEL_PATH = "model.joblib"
+SCALER_PATH = "scaler.joblib"
+SELECTED_FEATURES_PATH = "selected_features.joblib"
 
 # Load models and resources
 @st.cache_resource
 def load_resources():
     try:
-        if not MODEL_PATH.exists():
-            return None, None, None, f"File model tidak ditemukan di: {MODEL_PATH.absolute()}"
-        if not SCALER_PATH.exists():
-            return None, None, None, f"File scaler tidak ditemukan di: {SCALER_PATH.absolute()}"
-        if not SELECTED_FEATURES_PATH.exists():
-            return None, None, None, f"File selected_features tidak ditemukan di: {SELECTED_FEATURES_PATH.absolute()}"
-
-        with open(MODEL_PATH, "rb") as f:
-            model = pickle.load(f)
-        with open(SCALER_PATH, "rb") as f:
-            scaler = pickle.load(f)
-        with open(SELECTED_FEATURES_PATH, 'rb') as f:
-            selected_features = pickle.load(f)
+        model = joblib.load(MODEL_PATH)
+        scaler = joblib.load(SCALER_PATH)
+        selected_features = joblib.load(SELECTED_FEATURES_PATH)
         
         return model, scaler, selected_features, None
     except Exception as e:
