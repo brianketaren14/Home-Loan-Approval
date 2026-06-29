@@ -4,6 +4,8 @@ This repository contains a loan approval classification project built from the `
 
 ## Prediction Website UI
 Link : [website](https://home-loan-approval-brian-maxwell-ketaren.streamlit.app/)
+<img width="1910" height="1718" alt="image" src="https://github.com/user-attachments/assets/96cb9cb2-7f1a-4944-8cb2-4ab52f4fc60f" />
+
 
 ## Project Overview
 
