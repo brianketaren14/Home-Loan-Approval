@@ -119,8 +119,7 @@ else:
         # Run Prediction
         prediction = model.predict(df_selected)
         
-        # Display Prediction Result Card
-        st.subheader("🎯 HASIL ANALISIS KELAYAKAN")
+        # Display Prediction Result Car
         
         if prediction[0] == 1:
             st.markdown("""
