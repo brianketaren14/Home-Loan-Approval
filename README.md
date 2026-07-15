@@ -3,8 +3,9 @@
 This repository contains a loan approval classification project built from the `loan_sanction_train.csv` dataset. The goal is to predict whether a loan application will be approved based on customer details and financial information.
 
 ## Prediction Website UI
-Link : [website](https://home-loan-approval-brian-maxwell-ketaren.streamlit.app/)
-<img width="1910" height="1718" alt="image" src="https://github.com/user-attachments/assets/96cb9cb2-7f1a-4944-8cb2-4ab52f4fc60f" />
+Link : [website](https://home-loan-approval.vercel.app/)
+
+<img width="1853" height="967" alt="image" src="https://github.com/user-attachments/assets/0f344de1-d971-4bb7-9007-0ad8cd0286ad" />
 
 
 ## Project Overview
@@ -38,17 +39,28 @@ The notebook performs the following steps:
 
 ## Results
 
-The notebook compares model performance using specificity and AUC metrics:
+- EDA findings:
+    - Class imbalance: The target is imbalanced, motivating oversampling/cost-sensitive strategies.
+    - Missingness & cleaning: Several features contained missing values handled with imputation (simple or model-based) during preprocessing.
+    - Feature distributions: Numeric features show skew (e.g., income/amount), requiring log or power transforms and scaling.
+    - Correlations: Strong predictors identified include credit history, applicant income, and loan amount (and engineered ratios like debt-to-income), with some multicollinearity among related financial features.
+    - Categorical patterns: Certain categorical levels (employment, dependents, property area) align with target differences and benefit from careful encoding.
+    - Outliers: A small number of extreme values were present and handled (capping or removal) to stabilize training.
 
-- Specificity:
-  - LR — Ordinary 0.67 / SMOTETomek 0.61 / Bayesian 0.73. 
-  - XGB — Ordinary 0.73 / SMOTETomek 0.73 / Bayesian 0.64.
-- AUC: 
-  - LR — Ordinary 0.74 / SMOTETomek 0.77 / Bayesian 0.77. 
-  - XGB — Ordinary 0.82 / SMOTETomek 0.77 / Bayesian 0.77.
-- Summary: 
-  - LR Bayesian and XGB-SMOTETomek, XGB-Bayesian gives highest specificity (0.73). 
-  - XGB(Ordinary) gives highest AUC (0.82). 
+- Results:
+    - Specificity: 
+        - LR — Ordinary 0.67 / SMOTETomek 0.61 / Bayesian 0.73. 
+        - XGB — Ordinary 0.73 / SMOTETomek 0.73 / Bayesian 0.73.
+    - AUC: 
+        - LR — Ordinary 0.74 / SMOTETomek 0.71 / Bayesian 0.77. 
+        - XGB — Ordinary 0.82 / SMOTETomek 0.77 / Bayesian 0.82.
+    - Summary: 
+        - LR Bayesian and XGB-SMOTETomek, XGB-Bayesian gives highest specificity (0.73). 
+        - XGB-Ordinary and XGB-Bayesian gives highest AUC (0.82). 
+
+- Key insights:
+    - AUC improvements do not guarantee higher specificity—trade-offs exist between discrimination and negative-class recall.
+    - SMOTETomek did not consistently increase specificity; model- and feature-level.
 
 ## Conclusion
 
@@ -56,19 +68,3 @@ The notebook compares model performance using specificity and AUC metrics:
 - `Credit_History` remains the most important feature for loan approval decisions.
 - Data preprocessing, feature engineering, and handling imbalance are crucial for improving model reliability.
 - There is a trade-off between specificity and AUC, so model selection should align with the business objective (e.g., minimizing false loan approvals vs. maximizing overall discrimination).
-
-## Files
-
-- `LOAN APPROVAL.ipynb`: Main Jupyter notebook containing the full analysis, visualizations, and model training.
-
-## Tools and Libraries
-
-- Python
-- pandas
-- numpy
-- matplotlib
-- seaborn
-- scikit-learn
-- imbalanced-learn
-- xgboost
-- scikit-optimize
