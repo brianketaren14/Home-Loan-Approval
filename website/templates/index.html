@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Approval Predictor & Analytics</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --sidebar-color: #111827;
+            --card-color: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.15);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.15);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-color);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 3rem;
+            padding-left: 0.5rem;
+        }
+
+        .logo-icon {
+            font-size: 1.75rem;
+            background: linear-gradient(135deg, var(--primary), #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            list-style: none;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-glow);
+            color: #60a5fa;
+            border-left: 4px solid var(--primary);
+        }
+
+        .nav-item.active i {
+            color: #60a5fa;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Main Content Styling */
+        .main-content {
+            margin-left: 280px;
+            flex-grow: 1;
+            padding: 2.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - 280px);
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Dashboard View Layout */
+        .tab-content {
+            display: none;
+            flex-grow: 1;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .predict-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .predict-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Styles */
+        .glass-card {
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), #60a5fa);
+            opacity: 0.8;
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Form Controls */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            color: var(--text-secondary);
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.7rem;
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        select {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .input-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 1rem;
+            pointer-events: none;
+            color: var(--text-secondary);
+        }
+
+        /* Remove default arrow indicator for number inputs */
+        .input-wrapper-no-arrow::after {
+            display: none !important;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+            background-color: rgba(15, 23, 42, 0.8);
+        }
+
+        input:focus + i {
+            color: var(--primary);
+        }
+
+        .btn-submit {
+            grid-column: 1 / -1;
+            padding: 1rem;
+            margin-top: 1rem;
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: var(--transition);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--text-primary);
+        }
+
+        /* Slider Display */
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .slider-value {
+            font-weight: 600;
+            color: var(--primary);
+            background-color: var(--primary-glow);
+            padding: 0.15rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        /* Results Panel Styles */
+        .results-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        .status-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem 1.5rem;
+            border-radius: 20px;
+            background-color: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            min-height: 250px;
+            transition: var(--transition);
+        }
+
+        .status-icon-container {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            animation: pulse-idle 2s infinite ease-in-out;
+        }
+
+        .status-idle .status-icon-container {
+            background-color: var(--primary-glow);
+            color: var(--primary);
+        }
+
+        .status-approved .status-icon-container {
+            background-color: var(--success-glow);
+            color: var(--success);
+            box-shadow: 0 0 20px var(--success-glow);
+        }
+
+        .status-rejected .status-icon-container {
+            background-color: var(--danger-glow);
+            color: var(--danger);
+            box-shadow: 0 0 20px var(--danger-glow);
+        }
+
+        .status-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            max-width: 250px;
+            line-height: 1.5;
+        }
+
+        /* Probability Gauge */
+        .gauge-card {
+            flex-grow: 1;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), #60a5fa);
+            border-radius: 4px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Spinner animation */
+        .loading-spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-idle {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        /* Evidently Report Layout */
+        .report-container {
+            width: 100%;
+            height: calc(100vh - 180px);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background-color: #1e293b;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Feature Info Badge */
+        .features-badge {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .features-badge h4 {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .features-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .feature-tag {
+            font-size: 0.75rem;
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        .feature-tag.scaled {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo-container">
+            <i class="fa-solid fa-shield-halved logo-icon"></i>
+            <span class="logo-text">CrediPredict</span>
+        </div>
+        
+        <ul class="nav-links">
+            <li>
+                <a href="#" class="nav-item active" onclick="switchTab('predict-tab', this)">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Predict Loan</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-item" onclick="switchTab('report-tab', this)">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Evidently Report</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <i class="fa-solid fa-circle-nodes"></i>
+            <span>Model Version: XGBoost v1.0</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Predict Tab Content -->
+        <div id="predict-tab" class="tab-content active">
+            <header>
+                <div>
+                    <h1>Loan Approval Predictor</h1>
+                    <p class="subtitle">Enter applicant parameters to run instant ML-driven predictions</p>
+                </div>
+            </header>
+
+            <div class="predict-grid">
+                <!-- Left: Interactive Form -->
+                <div class="glass-card">
+                    <h3 class="card-title">
+                        <i class="fa-solid fa-user-pen text-primary" style="color: var(--primary)"></i>
+                        Applicant Information
+                    </h3>
+
+                    <form id="prediction-form" onsubmit="submitPrediction(event)">
+                        <div class="form-grid">
+                            <!-- Gender -->
+                            <div class="form-group">
+                                <label for="gender">Gender</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-venus-mars"></i>
+                                    <select id="gender" required>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Married -->
+                            <div class="form-group">
+                                <label for="married">Married Status</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-ring"></i>
+                                    <select id="married" required>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                        <option value="unknown">Unknown</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Dependents -->
+                            <div class="form-group">
+                                <label for="dependents">Dependents</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-users"></i>
+                                    <select id="dependents" required>
+                                        <option value="0">None (0)</option>
+                                        <option value="1">1 Dependent</option>
+                                        <option value="2">2 Dependents</option>
+                                        <option value="3+">3 or More (3+)</option>
+                                        <option value="unknown">Unknown</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Education -->
+                            <div class="form-group">
+                                <label for="education">Education</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                    <select id="education" required>
+                                        <option value="Graduate">Graduate</option>
+                                        <option value="Not Graduate">Not Graduate</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Self Employed -->
+                            <div class="form-group">
+                                <label for="self_employed">Self Employed</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-briefcase"></i>
+                                    <select id="self_employed" required>
+                                        <option value="No">No</option>
+                                        <option value="Yes">Yes</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Property Area -->
+                            <div class="form-group">
+                                <label for="property_area">Property Area</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-map-location-dot"></i>
+                                    <select id="property_area" required>
+                                        <option value="Semiurban">Semiurban</option>
+                                        <option value="Urban">Urban</option>
+                                        <option value="Rural">Rural</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Credit History -->
+                            <div class="form-group">
+                                <label for="credit_history">Credit History Status</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-clipboard-check"></i>
+                                    <select id="credit_history" required>
+                                        <option value="Yes">Good Credit (Yes)</option>
+                                        <option value="No">Bad/No Credit (No)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Loan Amount Term -->
+                            <div class="form-group">
+                                <label for="loan_amount_term">Loan Term (Months)</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    <select id="loan_amount_term" required>
+                                        <option value="360">360 Months (30 Years)</option>
+                                        <option value="180">180 Months (15 Years)</option>
+                                        <option value="240">240 Months (20 Years)</option>
+                                        <option value="120">120 Months (10 Years)</option>
+                                        <option value="84">84 Months (7 Years)</option>
+                                        <option value="36">36 Months (3 Years)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Applicant Income -->
+                            <div class="form-group full-width">
+                                <div class="slider-header">
+                                    <label for="applicant_income">Applicant Monthly Income ($)</label>
+                                    <span id="applicant_income_val" class="slider-value">5,000</span>
+                                </div>
+                                <div class="input-wrapper input-wrapper-no-arrow">
+                                    <i class="fa-solid fa-dollar-sign"></i>
+                                    <input type="number" id="applicant_income" min="100" max="85000" value="5000" oninput="updateVal('applicant_income')" required>
+                                </div>
+                            </div>
+
+                            <!-- Coapplicant Income -->
+                            <div class="form-group full-width">
+                                <div class="slider-header">
+                                    <label for="coapplicant_income">Coapplicant Monthly Income ($)</label>
+                                    <span id="coapplicant_income_val" class="slider-value">0</span>
+                                </div>
+                                <div class="input-wrapper input-wrapper-no-arrow">
+                                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                                    <input type="number" id="coapplicant_income" min="0" max="45000" value="0" oninput="updateVal('coapplicant_income')" required>
+                                </div>
+                            </div>
+
+                            <!-- Loan Amount -->
+                            <div class="form-group full-width">
+                                <div class="slider-header">
+                                    <label for="loan_amount">Loan Amount (in Thousands) ($)</label>
+                                    <span id="loan_amount_val" class="slider-value">150k ($150,000)</span>
+                                </div>
+                                <div class="input-wrapper input-wrapper-no-arrow">
+                                    <i class="fa-solid fa-money-bill-trend-up"></i>
+                                    <input type="number" id="loan_amount" min="10" max="800" value="150" oninput="updateVal('loan_amount')" required>
+                                </div>
+                            </div>
+
+                            <div class="form-actions" style="grid-column: 1 / -1; display: flex; gap: 1rem; margin-top: 1rem; width: 100%;">
+                                <button type="button" class="btn-secondary" onclick="loadSampleData()">
+                                    <i class="fa-solid fa-cloud-arrow-down"></i> Load Sample
+                                </button>
+                                <button type="submit" class="btn-submit" style="flex: 1.5; margin-top: 0;">
+                                    <span id="btn-text">Predict Approval</span>
+                                    <div class="loading-spinner" id="btn-spinner"></div>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right: Prediction Output -->
+                <div class="results-panel">
+                    <!-- Status Card -->
+                    <div id="status-card" class="status-card status-idle">
+                        <div class="status-icon-container">
+                            <i class="fa-solid fa-circle-question" id="status-icon"></i>
+                        </div>
+                        <h2 class="status-title" id="result-status">Awaiting Input</h2>
+                        <p class="status-desc" id="result-description">Fill out the applicant details and click 'Predict Approval' to start the analysis.</p>
+                    </div>
+
+                    <!-- Details Card (Gauge & Info) -->
+                    <div class="glass-card gauge-card">
+                        <h3 class="card-title">
+                            <i class="fa-solid fa-gauge-high" style="color: var(--primary)"></i>
+                            Probability Dashboard
+                        </h3>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                <span style="color: var(--text-secondary); font-size: 0.9rem;">Approval Probability:</span>
+                                <span id="probability-text" style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">0%</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-fill" id="probability-fill"></div>
+                            </div>
+                            <div class="progress-labels">
+                                <span>High Risk</span>
+                                <span>Low Risk</span>
+                            </div>
+                        </div>
+
+                        <!-- Selected features info -->
+                        <div class="features-badge">
+                            <h4>
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                Active Predictors (selected_features)
+                            </h4>
+                            <div class="features-list">
+                                <span class="feature-tag">Credit_History_Yes</span>
+                                <span class="feature-tag scaled">ApplicantIncome (Scaled)</span>
+                                <span class="feature-tag scaled">LoanAmount (Scaled)</span>
+                                <span class="feature-tag scaled">CoapplicantIncome (Scaled)</span>
+                                <span class="feature-tag scaled">Loan_Amount_Term (Scaled)</span>
+                                <span class="feature-tag">Education_Not Graduate</span>
+                                <span class="feature-tag">Self_Employed_Yes</span>
+                                <span class="feature-tag">Gender_Male</span>
+                                <span class="feature-tag">Property_Area_Semiurban</span>
+                                <span class="feature-tag">Dependents_0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Tab Content -->
+        <div id="report-tab" class="tab-content">
+            <header>
+                <div>
+                    <h1>Evidently Analytics Report</h1>
+                    <p class="subtitle">Detailed overview of feature metrics, data drift, and performance analysis</p>
+                </div>
+            </header>
+
+            <div class="report-container">
+                <!-- Lazy load report when requested -->
+                <iframe id="report-iframe" data-src="/report"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadSampleData() {
+            document.getElementById('gender').value = 'Male';
+            document.getElementById('married').value = 'Yes';
+            document.getElementById('dependents').value = '1';
+            document.getElementById('education').value = 'Graduate';
+            document.getElementById('self_employed').value = 'No';
+            document.getElementById('property_area').value = 'Semiurban';
+            document.getElementById('credit_history').value = 'Yes';
+            document.getElementById('loan_amount_term').value = '360';
+            
+            document.getElementById('applicant_income').value = '5849';
+            document.getElementById('coapplicant_income').value = '1508';
+            document.getElementById('loan_amount').value = '128';
+            
+            // Update labels
+            updateVal('applicant_income');
+            updateVal('coapplicant_income');
+            updateVal('loan_amount');
+        }
+
+        function updateVal(id) {
+            const input = document.getElementById(id);
+            const valSpan = document.getElementById(id + '_val');
+            
+            if (id === 'loan_amount') {
+                const dollars = parseInt(input.value) * 1000;
+                valSpan.textContent = input.value + 'k ($' + dollars.toLocaleString() + ')';
+            } else {
+                valSpan.textContent = parseInt(input.value).toLocaleString();
+            }
+        }
+
+        function switchTab(tabId, el) {
+            // Update Active Link styling
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            el.classList.add('active');
+
+            // Switch content tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+
+            // Load iframe src if we switch to the report tab
+            if (tabId === 'report-tab') {
+                const iframe = document.getElementById('report-iframe');
+                if (!iframe.src) {
+                    iframe.src = iframe.getAttribute('data-src');
+                }
+            }
+        }
+
+        async function submitPrediction(e) {
+            e.preventDefault();
+
+            const btnText = document.getElementById('btn-text');
+            const btnSpinner = document.getElementById('btn-spinner');
+            const form = document.getElementById('prediction-form');
+
+            btnText.style.opacity = '0.7';
+            btnSpinner.style.display = 'block';
+
+            // Gather inputs
+            const payload = {
+                gender: document.getElementById('gender').value,
+                married: document.getElementById('married').value,
+                dependents: document.getElementById('dependents').value,
+                education: document.getElementById('education').value,
+                self_employed: document.getElementById('self_employed').value,
+                property_area: document.getElementById('property_area').value,
+                credit_history: document.getElementById('credit_history').value,
+                loan_amount_term: document.getElementById('loan_amount_term').value,
+                applicant_income: document.getElementById('applicant_income').value,
+                coapplicant_income: document.getElementById('coapplicant_income').value,
+                loan_amount: document.getElementById('loan_amount').value
+            };
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                // UI elements for updates
+                const statusCard = document.getElementById('status-card');
+                const statusIcon = document.getElementById('status-icon');
+                const resultStatus = document.getElementById('result-status');
+                const resultDescription = document.getElementById('result-description');
+                const probText = document.getElementById('probability-text');
+                const probFill = document.getElementById('probability-fill');
+
+                if (response.ok) {
+                    const prob = result.probability[1]; // Probability of approved (1)
+                    const percent = Math.round(prob * 100);
+
+                    // Update Probability displays
+                    probText.textContent = percent + '%';
+                    probFill.style.width = percent + '%';
+
+                    statusCard.className = 'status-card'; // Clear classes
+                    if (result.prediction === 1) {
+                        statusCard.classList.add('status-approved');
+                        statusIcon.className = 'fa-solid fa-circle-check';
+                        resultStatus.textContent = 'Loan Approved';
+                        resultDescription.textContent = 'The applicant meets all criteria with ' + percent + '% confidence rate. The loan request has been approved.';
+                    } else {
+                        statusCard.classList.add('status-rejected');
+                        statusIcon.className = 'fa-solid fa-circle-xmark';
+                        resultStatus.textContent = 'Loan Rejected';
+                        resultDescription.textContent = 'The applicant presents higher risk profile (Approval likelihood is only ' + percent + '%). The loan request has been rejected.';
+                    }
+                } else {
+                    alert('Error: ' + (result.error || 'Unknown error occurred'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Connection error. Please try again.');
+            } finally {
+                btnText.style.opacity = '1';
+                btnSpinner.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
